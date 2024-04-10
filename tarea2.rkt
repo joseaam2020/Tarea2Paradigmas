@@ -1,6 +1,5 @@
 #lang racket
 
-
 #| 
   bCEj: inicializa juego con el numero de jugadores indicado
   param:
@@ -16,8 +15,10 @@
     -matriz_juego: lista con filas para jugador mas casa y columnas para cada carta en posesion
 |#
 (define (loopJuego matriz_juego)
-  (deal matriz_juego)
-  )
+  (cond
+    [(equal? (caar matriz_juego) 0)(loopJuego (deal matriz_juego))]
+    [else ( newDeal (newColumna matriz_juego) )]
+  ))
 
 #|
   deal: le da 2 cartas a la casa y cada jugador al empezar el juego
@@ -30,6 +31,13 @@
     [else (cons (dealJugador (car matriz_juego))(deal (cdr matriz_juego)))]
   ))
 
+(define (newDeal matriz_juego)
+  (cond
+    [(null? matriz_juego)'()]
+    [else (cons (dealJugador (car matriz_juego))(newDeal (cdr matriz_juego)))]
+    ;[else (cons (car matriz_juego)(newDeal (cdr matriz_juego)))]
+  ))
+
 #|
   dealJugador: reemplaza los ceros en la lista de cartas del jugador con cartas en la forma (valor tipo)
   param:
@@ -38,7 +46,8 @@
 (define (dealJugador lista_jugador)
   (cond
     [(null? lista_jugador)'()]
-    [(cons (cartaRandom)(dealJugador (cdr lista_jugador)))]
+    [(equal? (car lista_jugador) 0)(cons (cartaRandom)(dealJugador (cdr lista_jugador)))]
+    [else (cons (car lista_jugador)(dealJugador (cdr lista_jugador))) ]
   ))
 
 #|
@@ -65,7 +74,7 @@
 (define (puntaje lista)
   (cond
     [(null? lista) 0]
-    [else (+ (car lista) (puntaje (cdr lista)))]
+    [else (+ (caar lista) (puntaje (cdr lista)))]
    ))
 
 (define (bust? lista)
@@ -103,5 +112,12 @@
     [(equal? longitud 0)'()]
     [else (cons 0  (crearLista (- longitud 1)))]
   ))
+
+(define (newColumna matriz)
+  (cond
+    [(null? matriz)'()] 
+    [else (cons (append (car matriz)'(0)) (newColumna (cdr matriz)))]
+  )
+  )
 
 (bCEj 3)

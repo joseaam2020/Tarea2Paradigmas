@@ -120,4 +120,9 @@
   )
   )
 
-(bCEj 3)
+
+(println "Escriba el número de jugadores:")
+(define jugadores (read-line))
+(define num (string->number jugadores))
+
+(bCEj num)

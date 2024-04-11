@@ -1,10 +1,12 @@
 #lang racket
 (require racket/gui)
+(require "lista.rkt")
 (require "matriz.rkt")
 
 #| 
-  bCEj: inicializa juego con el numero de jugadores indicado
-  param:
+  bCEj: inicia loop juego con la matriz de juego (reprensenta las cartas de casa y cada jugador)
+  y crea el deck (todas las cartas de un deck de 52) 
+    param:
     -num_jugadores: numero de jugadores requerido
 |#
 (define (bCEj num_jugadores)
@@ -16,31 +18,22 @@
 #|
   loopJuego: el loop de juego se divide en deal y comparar para cada jugador
   param: 
-    -matriz_juego: lista con filas para jugador mas casa y columnas para cada carta en posesion
-    -lista_deck: lista con todas las cartas del deck 
+    -todas_las_cartas: lista de la forma (matriz_juego, deck)
 |#
-(define (loopJuego matriz_juego lista_deck)
+(define (loopJuego todas_las_cartas)
   (cond
-    [(equal? (caar matriz_juego) 0)(loopJuego (deal matriz_juego) lista_deck)]
-    [else ( newDeal (newColumna matriz_juego) )]
+    [(equal? (caar todas_las_cartas) 0)(loopJuego (deal todas_las_cartas))]
+    ;[else ( newDeal (newColumna matriz_juego) )]
   ))
 
 #|
   deal: le da 2 cartas a la casa y cada jugador al empezar el juego
   param: 
-    -matriz_juego: lista con filas para jugador mas casa y columnas para cada carta en posesion
+    -todas_las_cartas: lista de la forma (matriz_juego, deck)
 |#
-(define (deal matriz_juego)
+(define (deal todas_las_cartas fila columna)
   (cond
-    [(null? matriz_juego)'()]
-    [else (cons (dealJugador (car matriz_juego))(deal (cdr matriz_juego)))]
-  ))
-
-(define (newDeal matriz_juego)
-  (cond
-    [(null? matriz_juego)'()]
-    [else (cons (dealJugador (car matriz_juego))(newDeal (cdr matriz_juego)))]
-    ;[else (cons (car matriz_juego)(newDeal (cdr matriz_juego)))]
+    [(null? (car todas_las_cartas))'()]
   ))
 
 #|
@@ -55,6 +48,12 @@
     [else (cons (car lista_jugador)(dealJugador (cdr lista_jugador))) ]
   ))
 
+(define (newDeal matriz_juego)
+  (cond
+    [(null? matriz_juego)'()]
+    [else (cons (dealJugador (car matriz_juego))(newDeal (cdr matriz_juego)))]
+    ;[else (cons (car matriz_juego)(newDeal (cdr matriz_juego)))]
+  ))
 #|
   crearDeck: crea una lista de listas de la forma 
   ((valor1 tipo1)(valor2 tipo1)...(valor1 tipo2)(valor2 tipo2)...)
@@ -79,6 +78,27 @@
   (cond
     [(null? lista_valores)'()]
     [else (cons (cons (car lista_valores) (cons tipo '()))(crearCartas (cdr lista_valores) tipo))]
+  ))
+
+(define (shuffleDeck deck num_random)
+  (cond
+    [(null? deck)'()]
+    [else 
+      (if (<= (- (lengthList deck) 2) 0)
+        ;then
+        (cons 
+          (elementoLista 0 deck)
+          (shuffleDeck (eliminarElementoLista 0 deck) 0) 
+        );else
+        (cons 
+          (elementoLista num_random deck)
+          (shuffleDeck 
+           (eliminarElementoLista num_random deck) 
+           (random (- (lengthList deck) 2))
+          )
+        )
+      )
+    ]
   ))
 
 (define (puntaje lista)
@@ -106,3 +126,4 @@
 (define num (string->number jugadores))
 (bCEj num)
 |#
+(shuffleDeck (crearDeck '(A 2 3 4 5 6 7 8 9 10 J Q K)'(D C T B)) (random 51))

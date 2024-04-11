@@ -2,6 +2,8 @@
 (provide
     matriz
     newColumna
+    lengthFilas
+    lengthColumnas
 )
 (require "lista.rkt")
 
@@ -28,3 +30,6 @@
     [else (cons (append (car matriz)'(0)) (newColumna (cdr matriz)))]
   )
   )
+
+(define (lengthFilas matriz) (lengthList matriz))
+(define (lengthColumnas matriz) (lengthList (car matriz)))

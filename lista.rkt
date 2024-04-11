@@ -1,8 +1,10 @@
 #lang racket 
 (provide 
     elementoLista
+    eliminarElementoLista
     crearListaCero
     crearListaRandom
+    lengthList
 )
 
 #|
@@ -11,10 +13,21 @@
     -num_elemento: indice del elemento requerido (0 - (longitud lista -1)
     -lista: lista de la que se requiere un elemento
 |#
-(define (elementoLista num_elemento lista )
+(define (elementoLista num_elemento lista)
   (cond
     [(zero? num_elemento)(car lista)]
     [else (elementoLista (- num_elemento 1) (cdr lista))]
+  ))
+
+(define (eliminarElementoLista num_elemento lista)
+  (cond
+    [(null? lista)'()]
+    [(zero? num_elemento)(eliminarElementoLista (- num_elemento 1)(cdr lista))]
+    [else (append 
+            (cons (car lista) '())
+            (eliminarElementoLista (- num_elemento 1)(cdr lista))
+          )
+    ]
   ))
 
 #|
@@ -37,4 +50,10 @@
   (cond
   [(zero? num_elementos)'()]
   [else (cons (random valor_maximo) (crearListaRandom (- num_elementos -1) valor_maximo))]
+  ))
+
+(define (lengthList lista)
+  (cond
+    [(null? lista) 0]
+    [else (+ 1 (lengthList (cdr lista)))]
   ))

@@ -1,6 +1,5 @@
 #lang racket
-(require racket/include)
-(require racket/gui/easy)
+(require racket/gui)
 (require "matriz.rkt")
 
 #| 
@@ -101,9 +100,9 @@
     [else (cons (car lista) (cambia_aces (cdr lista)))]
    ))
 
-
-(crearDeck '(A 2 3 4 5 6 7 8 9 10 J Q K)'(D C T B))
-(render
-  (window
-    (text "Hello World!")
-  ))
+#|
+(println "Escriba el número de jugadores:")
+(define jugadores (read-line))
+(define num (string->number jugadores))
+(bCEj num)
+|#

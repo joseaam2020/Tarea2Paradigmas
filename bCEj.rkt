@@ -1,4 +1,7 @@
 #lang racket
+(require racket/include)
+(require racket/gui/easy)
+(require "matriz.rkt")
 
 #| 
   bCEj: inicializa juego con el numero de jugadores indicado
@@ -6,17 +9,20 @@
     -num_jugadores: numero de jugadores requerido
 |#
 (define (bCEj num_jugadores)
-  (loopJuego (matriz (+ num_jugadores 1) 2))
-  )
+  (loopJuego
+    (matriz (+ num_jugadores 1) 2)
+    (crearDeck '(A 2 3 4 5 6 7 8 9 10 J Q K)'(D C T B))
+  ))
 
 #|
   loopJuego: el loop de juego se divide en deal y comparar para cada jugador
   param: 
     -matriz_juego: lista con filas para jugador mas casa y columnas para cada carta en posesion
+    -lista_deck: lista con todas las cartas del deck 
 |#
-(define (loopJuego matriz_juego)
+(define (loopJuego matriz_juego lista_deck)
   (cond
-    [(equal? (caar matriz_juego) 0)(loopJuego (deal matriz_juego))]
+    [(equal? (caar matriz_juego) 0)(loopJuego (deal matriz_juego) lista_deck)]
     [else ( newDeal (newColumna matriz_juego) )]
   ))
 
@@ -46,31 +52,36 @@
 (define (dealJugador lista_jugador)
   (cond
     [(null? lista_jugador)'()]
-    [(equal? (car lista_jugador) 0)(cons (cartaRandom)(dealJugador (cdr lista_jugador)))]
+    ;[(equal? (car lista_jugador) 0)(cons (cartaRandom)(dealJugador (cdr lista_jugador)))]
     [else (cons (car lista_jugador)(dealJugador (cdr lista_jugador))) ]
   ))
 
 #|
-  cartaRandom: genera una carta con un valor aleatorio y un tipo aleatorio.
-  Los valores puedes ser  (A 1 2 3 4 5 6 7 8 9 10 J Q K) 
-  y los tipos (D(iamante), C(orazon),T(rebol),B(astos))
+  crearDeck: crea una lista de listas de la forma 
+  ((valor1 tipo1)(valor2 tipo1)...(valor1 tipo2)(valor2 tipo2)...)
+  param: 
+    -lista_valores: lista con valores
+    -lista_tipo: lista con el tipo de cada valor
 |#
-(define (cartaRandom)
-  (cons (elementoLista (random 12) '(A 2 3 4 5 6 7 8 9 10 J Q K))(cons (elementoLista (random 3) '(D C T B))'()))
-  )
+(define (crearDeck lista_valores lista_tipo)
+  (cond
+    [(null? lista_tipo)'()]
+    [else (append (crearCartas lista_valores (car lista_tipo))(crearDeck lista_valores (cdr lista_tipo)))]
+  ))
 
 #|
-  elementoLista: devuelve el elemento de la lista en la posicion indicada
-  param:
-    -num_elemento: indice del elemento requerido (0 - (longitud lista -1)
-    -lista: lista de la que se requiere un elemento
+  crearCartas: crea una lista de la forma 
+  ((valor1 tipo)(valor2 tipo)...); aux de crearDeck
+  param: 
+    -lista_valores: lista con valores
+    -tipo: tipo de los valores
 |#
-(define (elementoLista num_elemento lista )
+(define (crearCartas lista_valores tipo)
   (cond
-    [(zero? num_elemento)(car lista)]
-    [else (elementoLista (- num_elemento 1) (cdr lista))]
+    [(null? lista_valores)'()]
+    [else (cons (cons (car lista_valores) (cons tipo '()))(crearCartas (cdr lista_valores) tipo))]
   ))
-  
+
 (define (puntaje lista)
   (cond
     [(null? lista) 0]
@@ -90,34 +101,9 @@
     [else (cons (car lista) (cambia_aces (cdr lista)))]
    ))
 
-#|
-  matriz: genera una matriz de ciertas filas y columnas
-  param:
-    -num_filas: el numero de filas de la matriz
-    -num_columnas: el numero de columnas de la matriz
-|#
-(define (matriz num_filas num_columnas)
-  (cond
-    [(equal? num_filas 0)'()]
-    [else (cons (crearLista num_columnas) (matriz (- num_filas 1) num_columnas))]
+
+(crearDeck '(A 2 3 4 5 6 7 8 9 10 J Q K)'(D C T B))
+(render
+  (window
+    (text "Hello World!")
   ))
-
-#|
-  crearLista: crea una lista con elementos 0 de la longitud especificada
-  param:
-    -longitud: longitud de la lista
-|#
-(define (crearLista longitud)
-  (cond
-    [(equal? longitud 0)'()]
-    [else (cons 0  (crearLista (- longitud 1)))]
-  ))
-
-(define (newColumna matriz)
-  (cond
-    [(null? matriz)'()] 
-    [else (cons (append (car matriz)'(0)) (newColumna (cdr matriz)))]
-  )
-  )
-
-(bCEj 3)

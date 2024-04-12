@@ -2,6 +2,8 @@
 (provide
     matriz
     newColumna
+    elementoMatriz
+    writeElementoMatriz
     lengthFilas
     lengthColumnas
 )
@@ -31,5 +33,29 @@
   )
   )
 
+(define (elementoMatriz num_fila num_columna matriz)
+  (cond
+    [(zero? num_fila)(elementoLista num_columna (car matriz))]
+    [else (elementoMatriz (- num_fila 1) num_columna (cdr matriz))]
+  ))
+
+(define (writeElementoMatriz matriz fila columna nuevo_elemento)
+  (cond
+    [(null? matriz) '()]
+    [(zero? fila)
+      (cons 
+        (writeElementoLista (car matriz) columna nuevo_elemento)
+        (writeElementoMatriz (cdr matriz) (- fila 1) columna nuevo_elemento)
+      )
+    ]
+    [else
+      (cons
+        (car matriz)
+        (writeElementoMatriz (cdr matriz) (- fila 1) columna nuevo_elemento)
+      )
+    ]
+  ))
+
 (define (lengthFilas matriz) (lengthList matriz))
 (define (lengthColumnas matriz) (lengthList (car matriz)))
+

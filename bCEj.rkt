@@ -11,8 +11,16 @@
 |#
 (define (bCEj num_jugadores)
   (loopJuego
-    (matriz (+ num_jugadores 1) 2)
-    (crearDeck '(A 2 3 4 5 6 7 8 9 10 J Q K)'(D C T B))
+    (cons
+      (matriz (+ num_jugadores 1) 2)
+      (cons
+        (shuffleDeck
+          (crearDeck '(A 2 3 4 5 6 7 8 9 10 J Q K)'(D C T B))
+          (random 51)
+        )
+        '()
+      )
+    )
   ))
 
 #|
@@ -22,7 +30,8 @@
 |#
 (define (loopJuego todas_las_cartas)
   (cond
-    [(equal? (caar todas_las_cartas) 0)(loopJuego (deal todas_las_cartas))]
+    [(equal? (caaar todas_las_cartas) 0)(loopJuego (deal todas_las_cartas #f 0 0))]
+    [else todas_las_cartas]
     ;[else ( newDeal (newColumna matriz_juego) )]
   ))
 
@@ -31,11 +40,26 @@
   param: 
     -todas_las_cartas: lista de la forma (matriz_juego, deck)
 |#
-(define (deal todas_las_cartas fila columna)
+(define (deal todas_las_cartas preguntar? fila columna)
   (cond
-    [(null? (car todas_las_cartas))'()]
-  ))
+    [(>= fila (lengthFilas (car todas_las_cartas)))
+      todas_las_cartas]
+    [(>= columna (lengthColumnas (car todas_las_cartas)))
+      (deal todas_las_cartas preguntar? (+ fila 1) 0)]
+    [(equal? (elementoMatriz fila columna (car todas_las_cartas)) 0)
+      (deal 
+        (cons
+          (writeElementoMatriz (car todas_las_cartas) fila columna (caadr todas_las_cartas))
+          (cons (cdadr todas_las_cartas) '())
+        )
+        preguntar?
+        fila
+        (+ columna 1)
+      )
+    ]
+    [else (deal todas_las_cartas preguntar? fila (+ columna 1))]
 
+  ))
 #|
   dealJugador: reemplaza los ceros en la lista de cartas del jugador con cartas en la forma (valor tipo)
   param:
@@ -124,6 +148,5 @@
 (println "Escriba el número de jugadores:")
 (define jugadores (read-line))
 (define num (string->number jugadores))
-(bCEj num)
 |#
-(shuffleDeck (crearDeck '(A 2 3 4 5 6 7 8 9 10 J Q K)'(D C T B)) (random 51))
+(bCEj 1)

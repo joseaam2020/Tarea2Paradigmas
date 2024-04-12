@@ -5,6 +5,7 @@
     crearListaCero
     crearListaRandom
     lengthList
+    writeElementoLista
 )
 
 #|
@@ -30,6 +31,25 @@
     ]
   ))
 
+(define (writeElementoLista lista indice nuevo_elemento)
+  (cond
+    [(null? lista)'()]
+    [(zero? indice)
+      (cons 
+        nuevo_elemento 
+        (writeElementoLista (cdr lista) (- indice 1) nuevo_elemento)
+      )
+    ]
+    [else 
+      (cons
+        (car lista)
+        (writeElementoLista (cdr lista) (- indice 1) nuevo_elemento)
+      )
+    ]
+  )
+)
+
+
 #|
   crearListaCero: crea una lista con elementos 0 de la longitud especificada
   param:
@@ -49,7 +69,7 @@
 (define (crearListaRandom num_elementos valor_maximo)
   (cond
   [(zero? num_elementos)'()]
-  [else (cons (random valor_maximo) (crearListaRandom (- num_elementos -1) valor_maximo))]
+  [else (cons (random valor_maximo) (crearListaRandom (- num_elementos 1) valor_maximo))]
   ))
 
 (define (lengthList lista)
@@ -57,3 +77,4 @@
     [(null? lista) 0]
     [else (+ 1 (lengthList (cdr lista)))]
   ))
+

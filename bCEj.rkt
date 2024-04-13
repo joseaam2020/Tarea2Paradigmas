@@ -32,13 +32,15 @@
   (cond
     [(equal? (caaar todas_las_cartas) 0)(loopJuego (deal todas_las_cartas #f 0 0))]
     [else todas_las_cartas]
-    ;[else ( newDeal (newColumna matriz_juego) )]
   ))
 
 #|
   deal: le da 2 cartas a la casa y cada jugador al empezar el juego
   param: 
     -todas_las_cartas: lista de la forma (matriz_juego, deck)
+    -preguntar?: bool si debe preguntar antes de hacer deal a jugadores
+    -fila: fila en la cual empezar el deal
+    -columna: columna en la cual empezar el deal
 |#
 (define (deal todas_las_cartas preguntar? fila columna)
   (cond
@@ -58,28 +60,10 @@
       )
     ]
     [else (deal todas_las_cartas preguntar? fila (+ columna 1))]
-
-  ))
-#|
-  dealJugador: reemplaza los ceros en la lista de cartas del jugador con cartas en la forma (valor tipo)
-  param:
-    -lista_jugador: lista con las cartas del jugador
-|#
-(define (dealJugador lista_jugador)
-  (cond
-    [(null? lista_jugador)'()]
-    ;[(equal? (car lista_jugador) 0)(cons (cartaRandom)(dealJugador (cdr lista_jugador)))]
-    [else (cons (car lista_jugador)(dealJugador (cdr lista_jugador))) ]
   ))
 
-(define (newDeal matriz_juego)
-  (cond
-    [(null? matriz_juego)'()]
-    [else (cons (dealJugador (car matriz_juego))(newDeal (cdr matriz_juego)))]
-    ;[else (cons (car matriz_juego)(newDeal (cdr matriz_juego)))]
-  ))
-#|
-  crearDeck: crea una lista de listas de la forma 
+  #|
+    crearDeck: crea una lista de listas de la forma 
   ((valor1 tipo1)(valor2 tipo1)...(valor1 tipo2)(valor2 tipo2)...)
   param: 
     -lista_valores: lista con valores
@@ -104,6 +88,12 @@
     [else (cons (cons (car lista_valores) (cons tipo '()))(crearCartas (cdr lista_valores) tipo))]
   ))
 
+#|
+  shuffleDeck: recibe un deck y lo revuelve 
+  param:
+    -deck: lista de cartas en la forma (valor tipo)
+    -num_random: utilizando random de racker (random (- largo_lista 1))
+|#
 (define (shuffleDeck deck num_random)
   (cond
     [(null? deck)'()]

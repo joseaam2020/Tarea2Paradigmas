@@ -20,6 +20,12 @@
     [else (elementoLista (- num_elemento 1) (cdr lista))]
   ))
 
+#|
+  eliminarElementoLista: elimina elemento en la posicion indicada 
+  param:
+    -num_elemento: indice numerico del elemento en la lista que se va a eliminar
+    -lista: de elementos
+|#
 (define (eliminarElementoLista num_elemento lista)
   (cond
     [(null? lista)'()]
@@ -31,6 +37,13 @@
     ]
   ))
 
+#|
+  writeElementoLista: sobreescribe elemento en el indice indicado 
+  param: 
+    -lista: en la que se va a escribir el elemento 
+    -indice: posicion de la lista donde escribir el elemento
+    -nuevo_elemento: elemento a escribir.
+|#
 (define (writeElementoLista lista indice nuevo_elemento)
   (cond
     [(null? lista)'()]
@@ -72,6 +85,11 @@
   [else (cons (random valor_maximo) (crearListaRandom (- num_elementos 1) valor_maximo))]
   ))
 
+#|
+  lengthLista: devuelve valor numerico de cuantos elementos hay en la lista
+  param:
+    -lista: para medir
+|#
 (define (lengthList lista)
   (cond
     [(null? lista) 0]

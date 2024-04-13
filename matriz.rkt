@@ -33,12 +33,27 @@
   )
   )
 
+#|
+  elementroMatriz: devuelve del valor del elemento en la fila y columna indicada 
+  param:
+    -num_fila: numero de fila en la que se ubica el elemnto
+    -num_columna: numero de columna en la que se ubica el elemento
+    -matriz: de la cual se obtiene el elemento
+|#
 (define (elementoMatriz num_fila num_columna matriz)
   (cond
     [(zero? num_fila)(elementoLista num_columna (car matriz))]
     [else (elementoMatriz (- num_fila 1) num_columna (cdr matriz))]
   ))
 
+#|
+  writeElementoMatriz: sobreescribe elemento en la fila y columna indicados 
+  param: 
+    -Matriz: en la que se va a escribir el elemento 
+    -fila: numero de fila en la que se ubica el elemnto
+    -columna: numero de columna en la que se ubica el elemento
+    -nuevo_elemento: elemento a escribir.
+|#
 (define (writeElementoMatriz matriz fila columna nuevo_elemento)
   (cond
     [(null? matriz) '()]
@@ -56,6 +71,7 @@
     ]
   ))
 
-(define (lengthFilas matriz) (lengthList matriz))
-(define (lengthColumnas matriz) (lengthList (car matriz)))
+
+(define (lengthFilas matriz) (lengthList matriz));devuelve el numero de filas de la matriz indicada
+(define (lengthColumnas matriz) (lengthList (car matriz)));devuelve el numero de columnas de la matriz indicada
 

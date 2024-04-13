@@ -30,7 +30,18 @@
 |#
 (define (loopJuego todas_las_cartas)
   (cond
-    [(equal? (caaar todas_las_cartas) 0)(loopJuego (deal todas_las_cartas #f 0 0))]
+    [(equal? (caaar todas_las_cartas) 0)
+      (loopJuego  
+        (deal 
+          todas_las_cartas 
+         ; (crearListaAscendente (lengthFilas (car todas_las_cartas))) 
+          '(0)
+          0 
+          0
+          #t
+        )
+      )
+    ]
     [else todas_las_cartas]
   ))
 
@@ -38,28 +49,44 @@
   deal: le da 2 cartas a la casa y cada jugador al empezar el juego
   param: 
     -todas_las_cartas: lista de la forma (matriz_juego, deck)
-    -preguntar?: bool si debe preguntar antes de hacer deal a jugadores
+    -receptores: lista de todos los receptores de cartas  
     -fila: fila en la cual empezar el deal
     -columna: columna en la cual empezar el deal
+    -unica?: bool para saber si se debe entregar solo una carta
 |#
-(define (deal todas_las_cartas preguntar? fila columna)
+(define (deal todas_las_cartas receptores fila columna unica?)
   (cond
     [(>= fila (lengthFilas (car todas_las_cartas)))
       todas_las_cartas]
     [(>= columna (lengthColumnas (car todas_las_cartas)))
-      (deal todas_las_cartas preguntar? (+ fila 1) 0)]
-    [(equal? (elementoMatriz fila columna (car todas_las_cartas)) 0)
-      (deal 
-        (cons
-          (writeElementoMatriz (car todas_las_cartas) fila columna (caadr todas_las_cartas))
-          (cons (cdadr todas_las_cartas) '())
+      (deal todas_las_cartas receptores (+ fila 1) 0 unica?)]
+    [(and (isInLista? fila receptores)(equal? (elementoMatriz fila columna (car todas_las_cartas)) 0))
+      (if unica?
+        ;then
+        (deal 
+          (cons
+            (writeElementoMatriz (car todas_las_cartas) fila columna (caadr todas_las_cartas))
+           (cons (cdadr todas_las_cartas) '())
+          )
+          (eliminarElementoLista fila receptores)
+          fila
+          (+ columna 1)
+          unica?
         )
-        preguntar?
-        fila
-        (+ columna 1)
+        ;else
+        (deal 
+          (cons
+           (writeElementoMatriz (car todas_las_cartas) fila columna (caadr todas_las_cartas))
+            (cons (cdadr todas_las_cartas) '())
+          )
+          receptores
+          fila
+          (+ columna 1)
+          unica?
+        )
       )
     ]
-    [else (deal todas_las_cartas preguntar? fila (+ columna 1))]
+    [else (deal todas_las_cartas receptores fila (+ columna 1) unica?)]
   ))
 
   #|
@@ -102,12 +129,12 @@
         ;then
         (cons 
           (elementoLista 0 deck)
-          (shuffleDeck (eliminarElementoLista 0 deck) 0) 
+          (shuffleDeck (eliminarIndiceLista 0 deck) 0) 
         );else
         (cons 
           (elementoLista num_random deck)
           (shuffleDeck 
-           (eliminarElementoLista num_random deck) 
+           (eliminarIndiceLista num_random deck) 
            (random (- (lengthList deck) 2))
           )
         )

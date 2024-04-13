@@ -2,10 +2,12 @@
 (provide 
     elementoLista
     eliminarElementoLista
+    eliminarIndiceLista
     crearListaCero
-    crearListaRandom
+    crearListaAscendente
     lengthList
     writeElementoLista
+    isInLista?
 )
 
 #|
@@ -20,19 +22,25 @@
     [else (elementoLista (- num_elemento 1) (cdr lista))]
   ))
 
+(define (eliminarElementoLista elemento lista)
+  (cond
+    [(null? lista)'()]
+    [(equal? elemento (car lista))(cdr lista)]
+    [else (cons (car lista) (eliminarElementoLista elemento (cdr lista)))]
+  ))
 #|
-  eliminarElementoLista: elimina elemento en la posicion indicada 
+  eliminarIndiceLista: elimina elemento en la posicion indicada 
   param:
     -num_elemento: indice numerico del elemento en la lista que se va a eliminar
     -lista: de elementos
 |#
-(define (eliminarElementoLista num_elemento lista)
+(define (eliminarIndiceLista indice lista)
   (cond
     [(null? lista)'()]
-    [(zero? num_elemento)(eliminarElementoLista (- num_elemento 1)(cdr lista))]
+    [(zero? indice)(eliminarIndiceLista (- indice 1)(cdr lista))]
     [else (append 
             (cons (car lista) '())
-            (eliminarElementoLista (- num_elemento 1)(cdr lista))
+            (eliminarIndiceLista (- indice 1)(cdr lista))
           )
     ]
   ))
@@ -75,14 +83,20 @@
   ))
 
 #|
-  cartaRandom: genera una carta con un valor aleatorio y un tipo aleatorio.
-  Los valores puedes ser  (A 1 2 3 4 5 6 7 8 9 10 J Q K) 
-  y los tipos (D(iamante), C(orazon),T(rebol),B(astos))
+  crearListaAscendente: genera una lista con valores 
+  numericos ascendentes hasta llegar al numero de elementos indicado  
+  -param: 
+    num_elementos: valor numerico de elementos en la lista 
 |#
-(define (crearListaRandom num_elementos valor_maximo)
+(define (crearListaAscendente num_elementos)
   (cond
-  [(zero? num_elementos)'()]
-  [else (cons (random valor_maximo) (crearListaRandom (- num_elementos 1) valor_maximo))]
+    [(zero? num_elementos) (cons 0 '())]
+    [else 
+      (append  
+       (crearListaAscendente (- num_elementos 1)) 
+       (cons num_elementos '())
+      )
+    ]
   ))
 
 #|
@@ -96,3 +110,9 @@
     [else (+ 1 (lengthList (cdr lista)))]
   ))
 
+(define (isInLista? elemento lista)
+  (cond
+    [(null? lista) #f]
+    [(equal? (car lista) elemento) #t]
+    [else (isInLista? elemento (cdr lista))]
+  ))

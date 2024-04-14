@@ -30,7 +30,18 @@
 |#
 (define (loopJuego todas_las_cartas)
   (cond
-    [(equal? (caaar todas_las_cartas) 0)(loopJuego (deal todas_las_cartas #f 0 0))]
+    [(equal? (caaar todas_las_cartas) 0)
+      (loopJuego  
+        (deal 
+          todas_las_cartas 
+         ; (crearListaAscendente (lengthFilas (car todas_las_cartas))) 
+          '(0)
+          0 
+          0
+          #t
+        )
+      )
+    ]
     [else todas_las_cartas]
   ))
 
@@ -38,28 +49,44 @@
   deal: le da 2 cartas a la casa y cada jugador al empezar el juego
   param: 
     -todas_las_cartas: lista de la forma (matriz_juego, deck)
-    -preguntar?: bool si debe preguntar antes de hacer deal a jugadores
+    -receptores: lista de todos los receptores de cartas  
     -fila: fila en la cual empezar el deal
     -columna: columna en la cual empezar el deal
+    -unica?: bool para saber si se debe entregar solo una carta
 |#
-(define (deal todas_las_cartas preguntar? fila columna)
+(define (deal todas_las_cartas receptores fila columna unica?)
   (cond
     [(>= fila (lengthFilas (car todas_las_cartas)))
       todas_las_cartas]
     [(>= columna (lengthColumnas (car todas_las_cartas)))
-      (deal todas_las_cartas preguntar? (+ fila 1) 0)]
-    [(equal? (elementoMatriz fila columna (car todas_las_cartas)) 0)
-      (deal 
-        (cons
-          (writeElementoMatriz (car todas_las_cartas) fila columna (caadr todas_las_cartas))
-          (cons (cdadr todas_las_cartas) '())
+      (deal todas_las_cartas receptores (+ fila 1) 0 unica?)]
+    [(and (isInLista? fila receptores)(equal? (elementoMatriz fila columna (car todas_las_cartas)) 0))
+      (if unica?
+        ;then
+        (deal 
+          (cons
+            (writeElementoMatriz (car todas_las_cartas) fila columna (caadr todas_las_cartas))
+           (cons (cdadr todas_las_cartas) '())
+          )
+          (eliminarElementoLista fila receptores)
+          fila
+          (+ columna 1)
+          unica?
         )
-        preguntar?
-        fila
-        (+ columna 1)
+        ;else
+        (deal 
+          (cons
+           (writeElementoMatriz (car todas_las_cartas) fila columna (caadr todas_las_cartas))
+            (cons (cdadr todas_las_cartas) '())
+          )
+          receptores
+          fila
+          (+ columna 1)
+          unica?
+        )
       )
     ]
-    [else (deal todas_las_cartas preguntar? fila (+ columna 1))]
+    [else (deal todas_las_cartas receptores fila (+ columna 1) unica?)]
   ))
 
   #|
@@ -101,13 +128,13 @@
       (if (<= (- (lengthList deck) 2) 0)
         ;then
         (cons 
-          (elementoLista 0 deck)
-          (shuffleDeck (eliminarElementoLista 0 deck) 0) 
+          (elementoEnIndicaLista 0 deck)
+          (shuffleDeck (eliminarIndiceLista 0 deck) 0) 
         );else
         (cons 
-          (elementoLista num_random deck)
+          (elementoEnIndicaLista num_random deck)
           (shuffleDeck 
-           (eliminarElementoLista num_random deck) 
+           (eliminarIndiceLista num_random deck) 
            (random (- (lengthList deck) 2))
           )
         )
@@ -115,9 +142,30 @@
     ]
   ))
 
+(define (valorGanadorAux lista_puntajes valor_ganador)
+  (cond [(null? lista_puntajes) valor_ganador]
+        [(and (<= (car lista_puntajes) 21) (> (car lista_puntajes) valor_ganador)) (valorGanadorAux (cdr lista_puntajes) (car lista_puntajes))]
+        [else (valorGanadorAux (cdr lista_puntajes) valor_ganador)]
+        ))
+
+(define (valorGanador lista_puntajes)
+  (cond [(> (car lista_puntajes) 21) (valorGanador (cdr lista_puntajes))]
+        [else (valorGanadorAux (cdr lista_puntajes) (car lista_puntajes))]
+        ))
+
+(define (puntajes matriz)
+  (cond [(null? matriz) '()]
+        [(bust? (car matriz)) (cons (puntaje (cambia_aces(car matriz))) (puntajes (cdr matriz)))]
+        [else (cons (puntaje (car matriz)) (puntajes (cdr matriz)))]
+        ))
+
 (define (puntaje lista)
   (cond
     [(null? lista) 0]
+    [(equal? (caar lista) 'A) (+ 11 (puntaje (cdr lista)))]
+    [(equal? (caar lista) 'J) (+ 10 (puntaje (cdr lista)))]
+    [(equal? (caar lista) 'Q) (+ 10 (puntaje (cdr lista)))]
+    [(equal? (caar lista) 'K) (+ 10 (puntaje (cdr lista)))]
     [else (+ (caar lista) (puntaje (cdr lista)))]
    ))
 
@@ -129,14 +177,16 @@
 
 (define (cambia_aces lista)
   (cond
-    [(null? lista) lista]
-    [(equal? 11 (car lista)) (cons 1 (cdr lista))]
+    [(null? lista) '()]
+    [(equal? 'A (caar lista)) (cons (cons 1 (cdar lista)) (cambia_aces (cdr lista)))]
     [else (cons (car lista) (cambia_aces (cdr lista)))]
    ))
-
 #|
 (println "Escriba el número de jugadores:")
 (define jugadores (read-line))
 (define num (string->number jugadores))
 |#
-(bCEj 1)
+;(bCEj 1)
+(puntajes '(((A D)(8 T))((J B)(9 C))))
+(valorGanador (puntajes '(((A D)(8 T))((J B)(9 C)))))
+(elementoLista (valorGanador (puntajes '(((A D)(8 T))((J B)(9 C))))) (puntajes '(((A D)(8 T))((J B)(9 C)))) 0)

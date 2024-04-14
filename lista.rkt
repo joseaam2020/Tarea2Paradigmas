@@ -1,6 +1,7 @@
 #lang racket 
 (provide 
     elementoLista
+    elementoEnIndicaLista
     eliminarElementoLista
     eliminarIndiceLista
     crearListaCero
@@ -10,24 +11,39 @@
     isInLista?
 )
 
+(define (elementoLista elemento lista indice)
+  (cond
+    [(null? lista)'()]
+    [(equal? (car lista) elemento)
+      (cons indice (elementoLista elemento (cdr lista) (+ indice 1)))]
+    [else (elementoLista elemento (cdr lista) (+ indice 1))]
+  ))
 #|
-  elementoLista: devuelve el elemento de la lista en la posicion indicada
+  elementoEnIndicaLista: devuelve el elemento de la lista en la posicion indicada
   param:
     -num_elemento: indice del elemento requerido (0 - (longitud lista -1)
     -lista: lista de la que se requiere un elemento
 |#
-(define (elementoLista num_elemento lista)
+(define (elementoEnIndicaLista num_elemento lista)
   (cond
     [(zero? num_elemento)(car lista)]
-    [else (elementoLista (- num_elemento 1) (cdr lista))]
+    [else (elementoEnIndicaLista (- num_elemento 1) (cdr lista))]
   ))
 
+#|
+  eliminarElementoLista: elimina la primera la primera aparacion del elemento 
+  indicando 
+  param:
+    -elemento: a eliminar
+    -lista: de elementos
+|#
 (define (eliminarElementoLista elemento lista)
   (cond
     [(null? lista)'()]
     [(equal? elemento (car lista))(cdr lista)]
     [else (cons (car lista) (eliminarElementoLista elemento (cdr lista)))]
   ))
+
 #|
   eliminarIndiceLista: elimina elemento en la posicion indicada 
   param:

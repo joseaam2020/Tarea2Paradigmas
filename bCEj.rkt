@@ -128,11 +128,11 @@
       (if (<= (- (lengthList deck) 2) 0)
         ;then
         (cons 
-          (elementoLista 0 deck)
+          (elementoEnIndicaLista 0 deck)
           (shuffleDeck (eliminarIndiceLista 0 deck) 0) 
         );else
         (cons 
-          (elementoLista num_random deck)
+          (elementoEnIndicaLista num_random deck)
           (shuffleDeck 
            (eliminarIndiceLista num_random deck) 
            (random (- (lengthList deck) 2))
@@ -142,9 +142,30 @@
     ]
   ))
 
+(define (valorGanadorAux lista_puntajes valor_ganador)
+  (cond [(null? lista_puntajes) valor_ganador]
+        [(and (<= (car lista_puntajes) 21) (> (car lista_puntajes) valor_ganador)) (valorGanadorAux (cdr lista_puntajes) (car lista_puntajes))]
+        [else (valorGanadorAux (cdr lista_puntajes) valor_ganador)]
+        ))
+
+(define (valorGanador lista_puntajes)
+  (cond [(> (car lista_puntajes) 21) (valorGanador (cdr lista_puntajes))]
+        [else (valorGanadorAux (cdr lista_puntajes) (car lista_puntajes))]
+        ))
+
+(define (puntajes matriz)
+  (cond [(null? matriz) '()]
+        [(bust? (car matriz)) (cons (puntaje (cambia_aces(car matriz))) (puntajes (cdr matriz)))]
+        [else (cons (puntaje (car matriz)) (puntajes (cdr matriz)))]
+        ))
+
 (define (puntaje lista)
   (cond
     [(null? lista) 0]
+    [(equal? (caar lista) 'A) (+ 11 (puntaje (cdr lista)))]
+    [(equal? (caar lista) 'J) (+ 10 (puntaje (cdr lista)))]
+    [(equal? (caar lista) 'Q) (+ 10 (puntaje (cdr lista)))]
+    [(equal? (caar lista) 'K) (+ 10 (puntaje (cdr lista)))]
     [else (+ (caar lista) (puntaje (cdr lista)))]
    ))
 
@@ -156,14 +177,16 @@
 
 (define (cambia_aces lista)
   (cond
-    [(null? lista) lista]
-    [(equal? 11 (car lista)) (cons 1 (cdr lista))]
+    [(null? lista) '()]
+    [(equal? 'A (caar lista)) (cons (cons 1 (cdar lista)) (cambia_aces (cdr lista)))]
     [else (cons (car lista) (cambia_aces (cdr lista)))]
    ))
-
 #|
 (println "Escriba el número de jugadores:")
 (define jugadores (read-line))
 (define num (string->number jugadores))
 |#
-(bCEj 1)
+;(bCEj 1)
+(puntajes '(((A D)(8 T))((J B)(9 C))))
+(valorGanador (puntajes '(((A D)(8 T))((J B)(9 C)))))
+(elementoLista (valorGanador (puntajes '(((A D)(8 T))((J B)(9 C))))) (puntajes '(((A D)(8 T))((J B)(9 C)))) 0)

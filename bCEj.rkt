@@ -1,27 +1,15 @@
 #lang racket
+(provide 
+  deal
+  crearDeck
+  shuffleDeck
+  valorGanador
+  puntajes
+  bust?
+)
 (require racket/gui)
 (require "lista.rkt")
 (require "matriz.rkt")
-
-#| 
-  bCEj: inicia loop juego con la matriz de juego (reprensenta las cartas de casa y cada jugador)
-  y crea el deck (todas las cartas de un deck de 52) 
-    param:
-    -num_jugadores: numero de jugadores requerido
-|#
-(define (bCEj num_jugadores)
-  (loopJuego
-    (cons
-      (matriz (+ num_jugadores 1) 2)
-      (cons
-        (shuffleDeck
-          (crearDeck '(A 2 3 4 5 6 7 8 9 10 J Q K)'(D C T B))
-          (random 51)
-        )
-        '()
-      )
-    )
-  ))
 
 #|
   loopJuego: el loop de juego se divide en deal y comparar para cada jugador
@@ -187,6 +175,18 @@
 (define num (string->number jugadores))
 |#
 ;(bCEj 1)
-(puntajes '(((A D)(8 T))((J B)(9 C))))
-(valorGanador (puntajes '(((A D)(8 T))((J B)(9 C)))))
-(elementoLista (valorGanador (puntajes '(((A D)(8 T))((J B)(9 C))))) (puntajes '(((A D)(8 T))((J B)(9 C)))) 0)
+
+(deal
+  (cons
+    (matriz (+ 2 1) 2)
+    (cons
+      (shuffleDeck
+          (crearDeck '(A 2 3 4 5 6 7 8 9 10 J Q K)'(D C T B))
+          (random 51)
+      )
+      '()
+    )
+  )
+    (crearListaAscendente (- 2 1))
+    0 0 #f
+  )

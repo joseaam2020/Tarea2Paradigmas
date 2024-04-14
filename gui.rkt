@@ -6,60 +6,134 @@
 (require "matriz.rkt")
 (require "bCEj.rkt")
 
-(define carta-height 100)
-(define carta-width 80)
+(define carta-height 180)
+(define carta-width 120)
+(define back-carta (make-color 194 56 17))
 (define bg-color (make-color 16 161 50))
 (define world-height 600)
 (define world-width 800)
 
-(define (carta valor tipo width height)
-  (overlay/align "right" "bottom"
-    (above
-      (text (~a tipo) 18 "black")
-      (text (~a valor) 18 "black")
-    )
-    (overlay/align "left" "top"
-      (above
-        (text (~a valor) 18 "black")
-        (text (~a tipo) 18 "black")
+(define (maso num_cartas x y)
+  (cond
+    [(=< num_cartas 0)(rectangle (+ carta-height 24) (+ carta-width 24) "solid" bg-color)] 
+    [(place-image
+      (overlay
+        (rectangle carta-width carta-height "outline" "black")
+        (rectangle carta-width carta-height "solid" back-carta)
       )
+      x y
+      (maso (- num_cartas 4) (+ x 2) y)
+    )
+  ]
+  ))
+
+(define (carta valor tipo width height bocaArriba? casa?)
+  (if bocaArriba?
+    ;then
+    (overlay/align "right" "bottom"
+      (above
+       (text (~a tipo) 18 "black")
+        (text (~a valor) 18 "black")
+      )
+      (overlay/align "left" "top"
+        (above
+          (text (~a valor) 18 "black")
+          (text (~a tipo) 18 "black")
+        )
       (rectangle  width height "solid" "white")
+      )
+    )
+    ;else
+    (if casa?
+      ;then    
+      (rectangle  width height "solid" back-carta)
+      ;else
+      (overlay/align "right" "bottom"
+        (above
+          (text (~a tipo) 18 "white")
+          (text (~a valor) 18 "white")
+        )
+        (overlay/align "left" "top"
+          (above
+            (text (~a valor) 18 "white")
+            (text (~a tipo) 18 "white")
+          )
+          (rectangle  width height "solid" back-carta)
+        )
+      ) 
     )
   ))
 
-(define (printCartas cartas x y width height num_cartas)
+(define (printCartas cartas x y width height num_cartas casa?)
   (cond
     [(null? cartas)(rectangle width height "solid" bg-color)]
     [(equal? (car cartas) 0)
       (printCartas (cdr cartas) x y width height num_cartas)]
-    [else 
-      (place-image
-        (carta
-          (caar cartas)
-          (cadar cartas)
-          (- (/ width num_cartas) 10)
-          (- height 60)
+    [else
+      (if (>= 0 (- num_cartas (lengthList cartas)))
+        ;then
+        (place-image
+          (carta
+            (caar cartas)
+            (cadar cartas)
+            (- (/ width num_cartas) 10)
+            (- height 60)
+            #t
+            casa?
+          )
+          x y
+          (printCartas 
+            (cdr cartas) 
+            (+ (+ x 10) (- (/ width num_cartas) 10)) 
+            y width height num_cartas casa?
+          )
         )
-        x y
-        (printCartas (cdr cartas) (+ (+ x 10) (- (/ width num_cartas) 10)) y width height num_cartas)
-      )
+        ;else
+        (place-image
+          (carta
+            (caar cartas)
+            (cadar cartas)
+            (- (/ width num_cartas) 10)
+            (- height 60)
+            #f
+            casa?
+          )
+          x y
+          (printCartas 
+          (cdr cartas) 
+          (+ (+ x 10) (- (/ width num_cartas) 10))
+          y width height num_cartas casa?)
+        )
+      ) 
     ]
   ))
 
 (define (jugador numero width height cartas num_cartas)
-  (overlay/align "center" "top"
     (if (zero? numero)
     ;then 
-    (overlay
+    (overlay/align "center" "top"
+      (overlay
         (text (string-append "Casa:") 12 "white")
         (rectangle (- width 20) (- height 180) "solid" "gray") 
       ) 
+      (printCartas
+        cartas 
+        (+ (/ (- (/ width num_cartas) 10) 2) 5) 
+        100 width height num_cartas #t
+      )
+    )
     ;else 
-    (overlay
+    (overlay/align "center" "top"
+      (overlay
         (text (string-append "Jugador: " (~a numero)) 12 "white")
         (rectangle (- width 20) (- height 180) "solid" "gray") 
-      ))
-    (printCartas cartas (+ (/ (- (/ width num_cartas) 10) 2) 5) 100 width height num_cartas)
+      )
+      (printCartas
+        cartas 
+        (+ (/ (- (/ width num_cartas) 10) 2) 5) 
+        100 width height num_cartas #f
+      )
+    )
   ))
 
 (define (jugadores height_mesa width_mesa cartas_jugadores num_jugadores)
@@ -94,11 +168,14 @@
   ))
   
 (define (draw-world todas_las_cartas)
+  (place-image
+  (maso (lengthList (cadr todas_las_cartas)) (/ carta-width 2)(/ carta-height 2))
+  (+ (/ carta-width 2) 80) (/ carta-height 2) 
   (overlay
       (mesa world-height world-width todas_las_cartas)
       (empty-scene world-width world-height)
     )
-  )
+  ))
 
 (define (initialWorld num_jugadores) 
   (deal

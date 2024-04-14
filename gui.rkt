@@ -10,19 +10,9 @@
 (define carta-width 80)
 (define bg-color (make-color 16 161 50))
 (define world-height 600)
-(define world-width 600)
+(define world-width 800)
 
-(define numero 1)
-  (place-image 
-    (overlay
-    
-    )
-    0 0
-    () 
-    (rectangle 300 200 "solid" bg-color)
-  )
-
-(define (carta valor tipo)
+(define (carta valor tipo width height)
   (overlay/align "right" "bottom"
     (above
       (text (~a tipo) 18 "black")
@@ -30,26 +20,85 @@
     )
     (overlay/align "left" "top"
       (above
-        (text (~a tipo) 18 "black")
         (text (~a valor) 18 "black")
+        (text (~a tipo) 18 "black")
       )
-      (rectangle  carta-width carta-height "solid" "white")
+      (rectangle  width height "solid" "white")
     )
   ))
 
-(define (mesa height width color)
-  (rectangle height width "solid" color)
-  )
+(define (printCartas cartas x y width height num_cartas)
+  (cond
+    [(null? cartas)(rectangle width height "solid" bg-color)]
+    [(equal? (car cartas) 0)
+      (printCartas (cdr cartas) x y width height num_cartas)]
+    [else 
+      (place-image
+        (carta
+          (caar cartas)
+          (cadar cartas)
+          (- (/ width num_cartas) 10)
+          (- height 60)
+        )
+        x y
+        (printCartas (cdr cartas) (+ (+ x 10) (- (/ width num_cartas) 10)) y width height num_cartas)
+      )
+    ]
+  ))
+
+(define (jugador numero width height cartas num_cartas)
+  (overlay/align "center" "top"
+    (if (zero? numero)
+    ;then 
+    (overlay
+        (text (string-append "Casa:") 12 "white")
+        (rectangle (- width 20) (- height 180) "solid" "gray") 
+      ) 
+    ;else 
+    (overlay
+        (text (string-append "Jugador: " (~a numero)) 12 "white")
+        (rectangle (- width 20) (- height 180) "solid" "gray") 
+      ))
+    (printCartas cartas (+ (/ (- (/ width num_cartas) 10) 2) 5) 100 width height num_cartas)
+  ))
+
+(define (jugadores height_mesa width_mesa cartas_jugadores num_jugadores)
+  (cond
+    [(null? cartas_jugadores)(rectangle width_mesa height_mesa "solid" bg-color)]
+    [else 
+      (place-image
+        (jugador 
+          (+ 1 (- num_jugadores (lengthList cartas_jugadores)))
+          (/ width_mesa num_jugadores)
+          (/ height_mesa 3)
+          (car cartas_jugadores)
+          (lengthList (car cartas_jugadores))
+        )
+        (+ (/ (/ width_mesa num_jugadores) 2)(* (/ width_mesa num_jugadores) (- num_jugadores (lengthList cartas_jugadores)))) 
+        (+ (/ height_mesa 3)(/ (/ height_mesa 3) 2))
+        (jugadores
+          height_mesa
+          width_mesa
+          (cdr cartas_jugadores)
+          num_jugadores
+        )
+      )
+    ]
+  ))
+
+
+(define (mesa height width todas_las_cartas)
+  (overlay/align "center" "top"
+    (jugador 0 300 200 (caar todas_las_cartas) (lengthList (caar todas_las_cartas)))
+    (jugadores height width (cdar todas_las_cartas) (lengthList (cdar todas_las_cartas))) 
+  ))
   
 (define (draw-world todas_las_cartas)
-  (place-image 
-    (carta (caaaar todas_las_cartas)(car (cdaaar todas_las_cartas)))
-    (+ carta-width 10) (+ carta-height 10)
-    (overlay
-      (mesa world-height world-width bg-color)
+  (overlay
+      (mesa world-height world-width todas_las_cartas)
       (empty-scene world-width world-height)
     )
-  ))
+  )
 
 (define (initialWorld num_jugadores) 
   (deal

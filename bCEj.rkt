@@ -115,17 +115,33 @@
         [else (valorGanadorAux (cdr lista_puntajes) valor_ganador)]
         ))
 
+#|
+  valorGanador: para obtener el valor mas cercano a 21 y que sea menor a el de todos
+  los puntajes
+  param: 
+    -lista_puntajes: una lista con los puntajes de la casas y los jugadores en orden
+|#
 (define (valorGanador lista_puntajes)
   (cond [(> (car lista_puntajes) 21) (valorGanador (cdr lista_puntajes))]
         [else (valorGanadorAux (cdr lista_puntajes) (car lista_puntajes))]
         ))
 
+#|
+  puntajes: calcula los puntajes de todos los jugadores y los devuelve como una lista 
+  param:
+    -matriz: matriz_de_juego, todos los jugadores 
+|#
 (define (puntajes matriz)
   (cond [(null? matriz) '()]
         [(bust? (car matriz)) (cons (puntaje (cambia_aces(car matriz))) (puntajes (cdr matriz)))]
         [else (cons (puntaje (car matriz)) (puntajes (cdr matriz)))]
         ))
 
+#|
+  puntaje: calcula el puntaje de una jugador (valor numerico)
+  param:
+    -lista: de cartas del jugador 
+|#
 (define (puntaje lista)
   (cond
     [(null? lista) 0]
@@ -138,12 +154,23 @@
     [else (+ (caar lista) (puntaje (cdr lista)))]
    ))
 
+#|
+  bust?: boolean para saber si un jugador se paso de 21
+  param:
+    -lista: de todas las cartas de un jugador
+|#
 (define (bust? lista)
   (cond
     [(> (puntaje lista) 21) #t]
     [else #f]
    ))
 
+#|
+  cambia_aces: una funcion que determina si los valores de los A's
+  en una lista de cartas de jugador deben ser 1 o 11
+  param: 
+    -lista: de cartas de un jugador 
+|#
 (define (cambia_aces lista)
   (cond
     [(null? lista) '()]
@@ -151,9 +178,3 @@
     [(equal? 'A (caar lista)) (cons (cons 1 (cdar lista)) (cambia_aces (cdr lista)))]
     [else (cons (car lista) (cambia_aces (cdr lista)))]
    ))
-#|
-(println "Escriba el número de jugadores:")
-(define jugadores (read-line))
-(define num (string->number jugadores))
-|#
-;(bCEj 1)

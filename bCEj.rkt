@@ -168,6 +168,7 @@
 (define (cambia_aces lista)
   (cond
     [(null? lista) '()]
+    [(equal? (car lista) 0)(cons (car lista)(cambia_aces (cdr lista)))]
     [(equal? 'A (caar lista)) (cons (cons 1 (cdar lista)) (cambia_aces (cdr lista)))]
     [else (cons (car lista) (cambia_aces (cdr lista)))]
    ))

@@ -271,8 +271,23 @@
       )
   )))
 
+(define (handle-tick world)
+  (if (<= (elementoEnIndiceLista 0 (puntajes (car world))) 16)
+    ;then 
+    (append 
+      (deal 
+        (cons (newColumna (car world)) (cons (cadr world)  '()))
+        (cons 0 '()) 
+        0 0 #t
+      )
+      (cons (elementoEnIndiceLista 2 world) '())
+    )
+    ;else
+    world
+  )
+  )
 (define (initialWorld num_jugadores string) 
-  (append(deal
+  (append (deal
     (cons
       (matriz (+ num_jugadores 1) 2)
       (cons
@@ -290,6 +305,7 @@
 (define (bCEj num_jugadores)
   (big-bang (initialWorld num_jugadores 1)
     [to-draw draw-world]
+    [on-tick handle-tick]
     [on-mouse handle-mouse]
 ))
 (bCEj 2)

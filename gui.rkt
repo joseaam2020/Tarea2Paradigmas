@@ -13,6 +13,7 @@
 (define world-height 600)
 (define world-width 800)
 
+; se define imagenes para imprimir botones
 (define botones
   (place-image/align 
   (overlay
@@ -44,6 +45,11 @@
   )
 ))
   
+;se encarga de las entradas del mouse 
+;param:
+; world: (lista de todas las cartas en el turno anterior)
+; x y: posicion decimal del mouse con respecto a esquina superior izquierda
+; button: evento de mouse como "butto-down"
 (define (handle-mouse world x y button)
   (if (string=? button "button-down")
       ;then
@@ -102,6 +108,10 @@
         [else world])
       world))
 
+;Crea una pila de rectangulos que simula el maso
+;param:
+; num_cartas: el numero de cartas en el maso que divide entre cuatro para imprimir
+; x y: valores numericos de donde imprimir maso
 (define (maso num_cartas x y)
   (cond
     [(<= num_cartas 0)(rectangle (+ carta-height 24) (+ carta-width 24) "solid" bg-color)] 
@@ -116,6 +126,14 @@
   ]
   ))
 
+;crea la imagen de una carta
+;param:
+; valor: caracter valor de la carta
+; tipo: caracter tipo de la carta 
+; width: ancho necesario de la carta
+; height: alto necesario de la carta
+; bocaArriba?: bool si la carta esta boca arriba
+; casa?: bool si las cartas son de la casa
 (define (carta valor tipo width height bocaArriba? casa?)
   (if bocaArriba?
     ;then

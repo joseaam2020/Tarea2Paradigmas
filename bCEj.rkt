@@ -11,27 +11,6 @@
 (require "lista.rkt")
 (require "matriz.rkt")
 
-#|
-  loopJuego: el loop de juego se divide en deal y comparar para cada jugador
-  param: 
-    -todas_las_cartas: lista de la forma (matriz_juego, deck)
-|#
-(define (loopJuego todas_las_cartas)
-  (cond
-    [(equal? (caaar todas_las_cartas) 0)
-      (loopJuego  
-        (deal 
-          todas_las_cartas 
-         ; (crearListaAscendente (lengthFilas (car todas_las_cartas))) 
-          '(0)
-          0 
-          0
-          #t
-        )
-      )
-    ]
-    [else todas_las_cartas]
-  ))
 
 #|
   deal: le da 2 cartas a la casa y cada jugador al empezar el juego
@@ -178,18 +157,3 @@
 (define num (string->number jugadores))
 |#
 ;(bCEj 1)
-
-(deal
-  (cons
-    (matriz (+ 2 1) 2)
-    (cons
-      (shuffleDeck
-          (crearDeck '(A 2 3 4 5 6 7 8 9 10 J Q K)'(D C T B))
-          (random 51)
-      )
-      '()
-    )
-  )
-    (crearListaAscendente (- 2 1))
-    0 0 #f
-  )

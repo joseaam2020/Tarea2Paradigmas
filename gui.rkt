@@ -7,15 +7,104 @@
 (require "bCEj.rkt")
 
 (define carta-height 180)
-(define carta-width 120)
+(define carta-width 120) 
 (define back-carta (make-color 194 56 17))
 (define bg-color (make-color 16 161 50))
 (define world-height 600)
 (define world-width 800)
 
+(define botones
+  (place-image/align 
+  (overlay
+    (text "Pasar" 12 "black")
+    (overlay
+      (rectangle (/ world-width 2) (/ world-height 12) "outline" "black")
+      (rectangle (/ world-width 2) (/ world-height 12) "solid" "white")
+    ))
+  40 16 "left" "top" 
+  (place-image/align
+    (overlay
+      (text "Carta" 12 "black")
+      (overlay
+       (rectangle (/ world-width 2) (/ world-height 12) "outline" "black")
+       (rectangle (/ world-width 2) (/ world-height 12) "solid" "white")
+      ))
+    40 82 "left" "top"
+    (place-image/align
+      (overlay
+        (text "Reiniciar" 12 "black")
+        (overlay
+          (rectangle (/ world-width 2) (/ world-height 12) "outline" "black")
+          (rectangle (/ world-width 2) (/ world-height 12) "solid" "white")
+        )
+      )
+      40 148 "left" "top"
+      (rectangle world-width (/ world-height 3) "solid" bg-color)
+    )
+  )
+))
+  
+(define (handle-mouse world x y button)
+  (if (string=? button "button-down")
+      ;then
+      (cond
+        ;Si presion boton pasar
+        [(and 
+          (<= x (+ 40 (/ world-width 2)))
+          (<= y (+ 416 (/ world-height 12))) 
+          (>= x 40) (>= y 416))
+         (if (>= (elementoEnIndiceLista 2 world)(-(lengthList (car world)) 1))
+            ;then
+            (append 
+              (eliminarIndiceLista 2 world)
+              (cons 
+                (string-append 
+                  "Ganadores: " 
+                  (~a (elementoLista (valorGanador (puntajes (car world)))(puntajes (car world)) 0)))
+                '()
+              )
+            )
+            ;else
+            (append 
+              (eliminarIndiceLista 2 world)
+              (cons (+ (elementoEnIndiceLista 2 world) 1) '())
+            )
+          )
+        ]
+
+        ;Si presiona boton Carta 
+        [(and
+          (<= x (+ 40 (/ world-width 2)))
+          (<= y (+ 482 (/ world-height 12)))
+          (>= x 40) (>= y 482))
+          (if (isInLista? 0 (elementoEnIndiceLista (elementoEnIndiceLista 2 world) (car world)))
+          ;then
+            (append 
+              (deal 
+                (cons (car world)(cons (cadr world)'()))
+                (cons (elementoEnIndiceLista 2 world) '()) 
+                0 0 #t
+              ) 
+              (cons (elementoEnIndiceLista 2 world) '())
+            )
+            (append 
+              (deal 
+                (cons (newColumna (car world)) (cons (cadr world)  '()))
+                (cons (elementoEnIndiceLista 2 world) '()) 
+                0 0 #t
+              )
+              (cons (elementoEnIndiceLista 2 world) '())
+            ))]
+
+        ;Si presiona boton reiniciar
+        [(and (<= x (+ 40 (/ world-width 2))) (<= y (+ 548 (/ world-height 12))) (>= x 40) (>= y 548)) (initialWorld (- (lengthList (car world)) 1) 1)]
+
+        [else world])
+      world))
+
 (define (maso num_cartas x y)
   (cond
-    [(=< num_cartas 0)(rectangle (+ carta-height 24) (+ carta-width 24) "solid" bg-color)] 
+    [(<= num_cartas 0)(rectangle (+ carta-height 24) (+ carta-width 24) "solid" bg-color)] 
     [(place-image
       (overlay
         (rectangle carta-width carta-height "outline" "black")
@@ -68,7 +157,7 @@
   (cond
     [(null? cartas)(rectangle width height "solid" bg-color)]
     [(equal? (car cartas) 0)
-      (printCartas (cdr cartas) x y width height num_cartas)]
+      (printCartas (cdr cartas) x y width height num_cartas casa?)]
     [else
       (if (>= 0 (- num_cartas (lengthList cartas)))
         ;then
@@ -162,23 +251,28 @@
 
 
 (define (mesa height width todas_las_cartas)
-  (overlay/align "center" "top"
-    (jugador 0 300 200 (caar todas_las_cartas) (lengthList (caar todas_las_cartas)))
-    (jugadores height width (cdar todas_las_cartas) (lengthList (cdar todas_las_cartas))) 
-  ))
+  (place-image/align 
+    botones 
+    0 400 "left" "top"
+    (overlay/align "center" "top"
+      (jugador 0 300 200 (caar todas_las_cartas) (lengthList (caar todas_las_cartas)))
+      (jugadores height width (cdar todas_las_cartas) (lengthList (cdar todas_las_cartas))) 
+  )))
   
 (define (draw-world todas_las_cartas)
-  (place-image
-  (maso (lengthList (cadr todas_las_cartas)) (/ carta-width 2)(/ carta-height 2))
-  (+ (/ carta-width 2) 80) (/ carta-height 2) 
-  (overlay
-      (mesa world-height world-width todas_las_cartas)
-      (empty-scene world-width world-height)
-    )
-  ))
+  (overlay/align "right" "bottom" 
+    (text (~a (caddr todas_las_cartas)) 12 "black")
+    (place-image
+      (maso (lengthList (cadr todas_las_cartas)) (/ carta-width 2)(/ carta-height 2))
+      (+ (/ carta-width 2) 80) (/ carta-height 2) 
+      (overlay
+        (mesa world-height world-width todas_las_cartas)
+        (empty-scene world-width world-height)
+      )
+  )))
 
-(define (initialWorld num_jugadores) 
-  (deal
+(define (initialWorld num_jugadores string) 
+  (append(deal
     (cons
       (matriz (+ num_jugadores 1) 2)
       (cons
@@ -191,9 +285,11 @@
     )
     (crearListaAscendente num_jugadores)
     0 0 #f
-  ))
+  )(cons string '())))
 
 (define (bCEj num_jugadores)
-  (big-bang (initialWorld num_jugadores)
+  (big-bang (initialWorld num_jugadores 1)
     [to-draw draw-world]
+    [on-mouse handle-mouse]
 ))
+(bCEj 2)

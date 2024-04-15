@@ -116,11 +116,11 @@
       (if (<= (- (lengthList deck) 2) 0)
         ;then
         (cons 
-          (elementoEnIndicaLista 0 deck)
+          (elementoEnIndiceLista 0 deck)
           (shuffleDeck (eliminarIndiceLista 0 deck) 0) 
         );else
         (cons 
-          (elementoEnIndicaLista num_random deck)
+          (elementoEnIndiceLista num_random deck)
           (shuffleDeck 
            (eliminarIndiceLista num_random deck) 
            (random (- (lengthList deck) 2))
@@ -150,6 +150,8 @@
 (define (puntaje lista)
   (cond
     [(null? lista) 0]
+    [(equal? (car lista) 0)(+ 0 (puntaje(cdr lista)))]
+    [(equal? (caar lista) 0) (+ 0 (puntaje (cdr lista)))]
     [(equal? (caar lista) 'A) (+ 11 (puntaje (cdr lista)))]
     [(equal? (caar lista) 'J) (+ 10 (puntaje (cdr lista)))]
     [(equal? (caar lista) 'Q) (+ 10 (puntaje (cdr lista)))]

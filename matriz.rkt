@@ -42,7 +42,7 @@
 |#
 (define (elementoMatriz num_fila num_columna matriz)
   (cond
-    [(zero? num_fila)(elementoEnIndicaLista num_columna (car matriz))]
+    [(zero? num_fila)(elementoEnIndiceLista num_columna (car matriz))]
     [else (elementoMatriz (- num_fila 1) num_columna (cdr matriz))]
   ))
 

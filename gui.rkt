@@ -171,6 +171,13 @@
     )
   ))
 
+;imprime todas las cartas de una lista de cartas
+;param: 
+; cartas: lista de cartas
+; x y: valores numericos de la posicion donde imprimir cartas 
+; width height: valores numericos de ancho y alto de espacio para cartas
+; num_cartas: numerico, cuantas cartas se deben dibujar 
+; casa?: si las cartas de la lista son de la casa
 (define (printCartas cartas x y width height num_cartas casa?)
   (cond
     [(null? cartas)(rectangle width height "solid" bg-color)]
@@ -215,6 +222,12 @@
     ]
   ))
 
+;imprime el espacio de una jugador, con su letrero respectivo y sus cartas 
+;param: 
+; numero: numero que debe aparecer en el letrero del jugador 
+; width height: valores numericos de ancho y alto de espacio para cartas
+; cartas: lista de cartas a imprimir
+; num_cartas: numero de cartas a imprimir 
 (define (jugador numero width height cartas num_cartas)
     (if (zero? numero)
     ;then 
@@ -243,6 +256,12 @@
     )
   ))
 
+;imprime el espacio de todos los jugadores, tomando en cuenta el tamaño del canvas y
+;la cantidad de jugadores
+;param: 
+; width_mesa height_mesa: valores numericos de ancho y alto de espacio para jugadores
+; cartas_jugadores: lista con todas las cartas de los jugadores
+; num_jugadores: la cantidad de jugadores
 (define (jugadores height_mesa width_mesa cartas_jugadores num_jugadores)
   (cond
     [(null? cartas_jugadores)(rectangle width_mesa height_mesa "solid" bg-color)]
@@ -267,7 +286,10 @@
     ]
   ))
 
-
+;imprime tanto las cartas de la casa como de los jugadores
+;param:
+; width height: valores numericos de ancho y alto de ventana
+; todas_las_cartas: (lista de la forma matriz_de_juego,deck) 
 (define (mesa height width todas_las_cartas)
   (place-image/align 
     botones 
@@ -289,6 +311,9 @@
       )
   )))
 
+;se utiliza para decidir si la casa necesita cartas
+; param: 
+; world:  lista de todas las cartas del turno pasado
 (define (handle-tick world)
   (if (<= (elementoEnIndiceLista 0 (puntajes (car world))) 16)
     ;then 
@@ -304,6 +329,11 @@
     world
   )
   )
+
+;se utiliza para crear todas las cartas 
+;param: 
+; num_jugadores: numerico de los jugadores solicitados
+; string: un valor necesario para saber el turno 
 (define (initialWorld num_jugadores string) 
   (append (deal
     (cons
@@ -320,6 +350,10 @@
     0 0 #f
   )(cons string '())))
 
+;funcion con la cual se inicia el juego tomando en cuenta la cantidad de jugadores
+;solicitada, limita la cantidad a 3
+;param: 
+;   num_jugadores: numerico de cuantos jugadores se quieren en la partida
 (define (bCEj num_jugadores)
   (if (> num_jugadores 3)
     ;then

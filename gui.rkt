@@ -303,9 +303,15 @@
   )(cons string '())))
 
 (define (bCEj num_jugadores)
-  (big-bang (initialWorld num_jugadores 1)
-    [to-draw draw-world]
-    [on-tick handle-tick]
-    [on-mouse handle-mouse]
-))
+  (if (> num_jugadores 3)
+    ;then
+    (error "Ingrese una cantidad de 1 a 3") 
+    ;else
+    (big-bang (initialWorld num_jugadores 1)
+      [to-draw draw-world]
+      [on-tick handle-tick]
+      [on-mouse handle-mouse]
+    )
+  )
+)
 (bCEj 2)

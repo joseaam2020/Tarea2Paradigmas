@@ -128,7 +128,7 @@
       (if (<= (- (lengthList deck) 2) 0)
         ;then
         (cons 
-          (elementoEnIndicaLista 0 deck)
+          (elementoEnIndiceLista 0 deck)
           (shuffleDeck (eliminarIndiceLista 0 deck) 0) 
         );else
         (cons 
